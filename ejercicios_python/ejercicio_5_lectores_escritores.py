@@ -69,6 +69,11 @@ def lector(id_lector, iteraciones=2):
         #     sem_write.acquire() # El primer lector bloquea a cualquier escritor
         # mutex.release()
 
+        mutex.acquire()
+        readcounter += 1
+        if readcounter == 1:
+            sem_write.acquire() # El primer lector bloquea a cualquier escritor
+        mutex.release()
         # --- SECCIÓN CRÍTICA DE LECTURA (COMPARTIDA) ---
         log(f"📖 Lector {id_lector} LEYENDO datos (v{base_de_datos['version']}) | Lectores activos: {readcounter}")
         time.sleep(random.uniform(0.2, 0.5))

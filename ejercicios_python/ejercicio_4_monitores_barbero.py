@@ -73,6 +73,25 @@ class BarberiaMonitor:
             #    - avisar al barbero y al siguiente cliente en espera (notify).
             # 7. Retornar True.
             # =====================================================================
+            self.clientes_esperando += 1
+            self.cond_barbero.notify()
+            while self.silla_barbero_ocupada:
+              self.cond_sala_espera.wait()
+            self.clientes_esperando -= 1
+            self.silla_barbero_ocupada = True
+            self.cliente_listo_en_sillon = True
+            self.cond_barbero.notify()
+            while not self.corte_terminado:
+              self.cond_corte.wait()
+            self.silla_barbero_ocupada = False
+            self.cliente_listo_en_sillon = False
+            self.corte_terminado = False
+            self.cond_barbero.notify()
+            self.cond_sala_espera.notify()
+            return True
+
+
+
             pass
             return False
 
@@ -89,6 +108,13 @@ class BarberiaMonitor:
             # 2. Si la barbería cerró y no quedan clientes, retornar False.
             # 3. Si hay un cliente listo en el sillón, retornar True.
             # =====================================================================
+            while not self.cliente_listo_en_sillon and self.barberia_abierta:
+              if self.clientes_esperando > 0:
+                    self.cond_sala_espera.notify()
+              self.cond_barbero.wait()
+            if not self.barberia_abierta and not self.cliente_listo_en_sillon:
+                return False
+            return True
             pass
             return False
 
@@ -106,6 +132,11 @@ class BarberiaMonitor:
             # 2. Avisar al cliente en el sillón (self.cond_corte.notify()).
             # 3. Esperar a que el cliente se levante del sillón (self.cond_barbero.wait()).
             # =====================================================================
+
+            self.corte_terminado = True
+            self.cond_corte.notify()
+            while self.silla_barbero_ocupada:
+                self.cond_barbero.wait()
             pass
 
     def cerrar_barberia(self):

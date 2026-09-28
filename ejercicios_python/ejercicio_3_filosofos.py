@@ -53,6 +53,9 @@ def filosofo(id, rondas=3):
     - Los demás filósofos toman primero el IZQUIERDO y luego el DERECHO.
     - Alternativamente, puedes usar un semáforo contador (árbitro/mozo) que permita un máximo de 4 comensales.
     """
+
+
+
     for _ in range(rondas):
         pensar(id)
         
@@ -68,6 +71,19 @@ def filosofo(id, rondas=3):
         #
         # TODO: Adquiere los tenedores adyacentes de forma segura, invoca comer(id)
         # y libera los tenedores:
+
+        if id == NUM_FILOSOFOS - 1:
+            tenedores[tenedor_der].acquire()
+            tenedores[tenedor_izq].acquire()
+        else:
+            tenedores[tenedor_izq].acquire()
+            tenedores[tenedor_der].acquire()
+            
+        comer(id)
+        
+        # Liberar tenedores
+        tenedores[tenedor_izq].release()
+        tenedores[tenedor_der].release()
         pass
         # =========================================================================
         # FIN TODO
